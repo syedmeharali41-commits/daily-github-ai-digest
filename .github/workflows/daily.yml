@@ -1,25 +1,45 @@
 name: Daily AI GitHub Scraper
+
 on:
   schedule:
-    - cron: '0 4 * * *' # Pakistan ke subah 9 baje (4:00 AM UTC) khud chalega
-  workflow_dispatch: # Isse aap jab chahein manual button daba kar run kar sakte hain
+    - cron: '0 4 * * *'   # 4:00 AM UTC = 9:00 AM PKT
+  workflow_dispatch:        # allows manual run from GitHub UI
+
+permissions:
+  contents: read
 
 jobs:
   run-scraper:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
-    - name: Install Dependencies
-      run: pip install requests
-    - name: Run Script
-      env:
-        GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-        EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
-        EMAIL_RECEIVER: ${{ secrets.EMAIL_RECEIVER }}
-        EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
-      run: python app.py
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: pip install --no-cache-dir requests
+
+      - name: Run Digest Script
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
+          EMAIL_RECEIVER: ${{ secrets.EMAIL_RECEIVER }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python app.py
+
+      - name: Upload run log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: digest-run-log
+          path: |
+            *.log
+          if-no-files-found: ignore
