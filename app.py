@@ -137,7 +137,7 @@ Repository data (JSON):
 
 
 def call_groq(prompt, api_key, model):
-    url = "url = "https://api.groq.com/openai/v1/chat/completions"
+    url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
     data = {
         "model": model,
