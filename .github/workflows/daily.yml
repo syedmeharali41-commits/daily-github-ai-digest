@@ -1,0 +1,25 @@
+name: Daily AI GitHub Scraper
+on:
+  schedule:
+    - cron: '0 4 * * *' # Pakistan ke subah 9 baje (4:00 AM UTC) khud chalega
+  workflow_dispatch: # Isse aap jab chahein manual button daba kar run kar sakte hain
+
+jobs:
+  run-scraper:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+    - name: Install Dependencies
+      run: pip install requests
+    - name: Run Script
+      env:
+        GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
+        EMAIL_RECEIVER: ${{ secrets.EMAIL_RECEIVER }}
+        EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+      run: python app.py
