@@ -126,8 +126,10 @@ For each category, output an HTML "card" containing:
 
 Design requirements:
 - Return ONLY raw HTML for a series of <div> "cards", no markdown, no code fences, no <html>/<body> tags
-- Dark-mode premium dashboard aesthetic: card background #161b22, border 1px solid #30363d, border-radius 10px, padding 16px, margin-bottom 16px
-- Accent colors: #58a6ff for links/titles, #7ed321 or #3fb950 for star counts/badges
+- Light, clean dashboard aesthetic for email: card background #f6f8fa, border 1px solid #d0d7de, border-radius 10px, padding 16px, margin-bottom 16px
+- Text colors: headings/links #0969da (blue), body text #24292f (dark gray), secondary text #57606a
+- Star count badge: background #ddf4ff, text #0969da, small rounded pill
+- Language badge: background #f6f8fa, border 1px solid #d0d7de, text #57606a, small rounded pill
 - Use inline CSS only (no <style> blocks, no classes)
 - Make it readable in email clients (avoid flexbox/grid; use simple block/inline-block + tables if needed)
 
@@ -208,29 +210,29 @@ def build_email_html(ai_html, repo_count):
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="margin:0; padding:0; background-color:#0d1117; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0d1117; padding:24px 0;">
+<body style="margin:0; padding:0; background-color:#f6f8fa; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f6f8fa; padding:24px 0;">
     <tr>
       <td align="center">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:640px; background-color:#0d1117;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:640px; background-color:#ffffff; border:1px solid #d0d7de; border-radius:12px; overflow:hidden;">
           <tr>
-            <td style="padding: 0 16px 24px 16px; border-bottom:1px solid #30363d;">
-              <h1 style="color:#58a6ff; font-size:24px; font-weight:700; margin:0 0 8px 0;">
+            <td style="padding: 24px 20px; border-bottom:1px solid #d0d7de; background-color:#ffffff;">
+              <h1 style="color:#0969da; font-size:22px; font-weight:700; margin:0 0 6px 0;">
                 🤖 AI-Curated GitHub Digest
               </h1>
-              <p style="color:#8b949e; font-size:13px; margin:0;">
+              <p style="color:#57606a; font-size:13px; margin:0;">
                 {today_str} &nbsp;•&nbsp; {repo_count} fresh repos analyzed in the last 24 hours
               </p>
             </td>
           </tr>
           <tr>
-            <td style="padding: 24px 16px;">
+            <td style="padding: 20px;">
               {ai_html}
             </td>
           </tr>
           <tr>
-            <td style="padding: 20px 16px; border-top:1px solid #30363d; text-align:center;">
-              <p style="color:#6e7681; font-size:11px; letter-spacing:1px; margin:0;">
+            <td style="padding: 16px 20px; border-top:1px solid #d0d7de; text-align:center; background-color:#f6f8fa;">
+              <p style="color:#8c959f; font-size:11px; letter-spacing:1px; margin:0;">
                 AUTOMATED VIA GITHUB ACTIONS &amp; GROQ AI
               </p>
             </td>
