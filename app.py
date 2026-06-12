@@ -117,21 +117,28 @@ alternative exists in another category's pool.
 Categories:
 {category_lines}
 
-For each category, output an HTML "card" containing:
-- The category name with its emoji as a small heading
-- The repo's full name as a hyperlink (target="_blank") to its GitHub URL
-- The current star count, clearly labeled
-- A punchy 2-line description: WHAT it does and WHY it's useful (your own words, not copy-pasted)
-- The primary language as a small tag/badge
+For each category, output ONE <tr> table row with exactly this structure:
 
-Design requirements:
-- Return ONLY raw HTML for a series of <div> "cards", no markdown, no code fences, no <html>/<body> tags
-- Light, clean dashboard aesthetic for email: card background #f6f8fa, border 1px solid #d0d7de, border-radius 10px, padding 16px, margin-bottom 16px
-- Text colors: headings/links #0969da (blue), body text #24292f (dark gray), secondary text #57606a
-- Star count badge: background #ddf4ff, text #0969da, small rounded pill
-- Language badge: background #f6f8fa, border 1px solid #d0d7de, text #57606a, small rounded pill
-- Use inline CSS only (no <style> blocks, no classes)
-- Make it readable in email clients (avoid flexbox/grid; use simple block/inline-block + tables if needed)
+<tr style="border-bottom:1px solid #e0e0e0;">
+  <td style="padding:16px 12px; vertical-align:top;">
+    <div style="font-weight:600; font-size:13px; color:#888888; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">CATEGORY EMOJI + NAME HERE</div>
+    <a href="REPO_URL" target="_blank" style="font-size:15px; font-weight:600; color:#1a6496; text-decoration:none;">REPO FULL NAME</a>
+    <p style="margin:8px 0 10px 0; font-size:13px; color:#444444; line-height:1.6;">
+      Write 2 punchy sentences: WHAT it does and WHY a developer would care. Use your own words, not copy-paste.
+    </p>
+    <span style="display:inline-block; background:#f0f0f0; border:1px solid #d0d0d0; border-radius:4px; padding:2px 8px; font-size:11px; color:#555555; margin-right:6px;">LANGUAGE</span>
+    <span style="display:inline-block; background:#fff3cd; border:1px solid #ffc107; border-radius:4px; padding:2px 8px; font-size:11px; color:#856404;">⭐ STAR_COUNT stars</span>
+  </td>
+  <td style="padding:16px 12px; vertical-align:middle; text-align:center; width:130px; white-space:nowrap;">
+    <a href="REPO_URL" target="_blank" style="display:inline-block; background:#1db954; color:#ffffff; font-weight:700; font-size:13px; text-decoration:none; padding:9px 18px; border-radius:5px;">Go to Repo →</a>
+  </td>
+</tr>
+
+Rules:
+- Return ONLY the raw <tr> rows — no markdown, no code fences, no wrapping tags
+- No <table>, no <html>, no <body> — just the <tr> elements back to back
+- Fill in all placeholder values (CATEGORY, REPO URL, REPO FULL NAME, LANGUAGE, STAR COUNT) from the data
+- The description must be YOUR OWN words — informative and punchy, not copied from the repo description
 
 Repository data (JSON):
 {json.dumps(simplified_repos, ensure_ascii=False)}
@@ -201,7 +208,7 @@ def analyze_with_ai(repos_data):
 # ----------------------------------------------------------------------------
 # Step 3: Build and send the email
 # ----------------------------------------------------------------------------
-def build_email_html(ai_html, repo_count):
+def build_email_html(ai_rows, repo_count):
     today_str = datetime.now().strftime("%A, %d %B %Y")
 
     return f"""\
@@ -210,33 +217,50 @@ def build_email_html(ai_html, repo_count):
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="margin:0; padding:0; background-color:#f6f8fa; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f6f8fa; padding:24px 0;">
+<body style="margin:0; padding:0; background-color:#f2f2f2; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f2f2f2; padding:24px 0;">
     <tr>
       <td align="center">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:640px; background-color:#ffffff; border:1px solid #d0d7de; border-radius:12px; overflow:hidden;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:680px; background-color:#ffffff; border:1px solid #d6d6d6; border-radius:8px; overflow:hidden;">
+
+          <!-- Header -->
           <tr>
-            <td style="padding: 24px 20px; border-bottom:1px solid #d0d7de; background-color:#ffffff;">
-              <h1 style="color:#0969da; font-size:22px; font-weight:700; margin:0 0 6px 0;">
+            <td style="padding:20px 24px; background-color:#1a1a2e; border-bottom:3px solid #1db954;">
+              <h1 style="color:#ffffff; font-size:20px; font-weight:700; margin:0 0 4px 0;">
                 🤖 AI-Curated GitHub Digest
               </h1>
-              <p style="color:#57606a; font-size:13px; margin:0;">
+              <p style="color:#aaaaaa; font-size:12px; margin:0;">
                 {today_str} &nbsp;•&nbsp; {repo_count} fresh repos analyzed in the last 24 hours
               </p>
             </td>
           </tr>
+
+          <!-- Table Header Row -->
           <tr>
-            <td style="padding: 20px;">
-              {ai_html}
+            <td style="padding:0;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+                <thead>
+                  <tr style="background-color:#2d2d2d;">
+                    <th style="padding:10px 12px; text-align:left; font-size:11px; font-weight:700; color:#cccccc; letter-spacing:1px; text-transform:uppercase;">PROJECT DESCRIPTION</th>
+                    <th style="padding:10px 12px; text-align:center; font-size:11px; font-weight:700; color:#cccccc; letter-spacing:1px; text-transform:uppercase; width:130px;">LINK</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ai_rows}
+                </tbody>
+              </table>
             </td>
           </tr>
+
+          <!-- Footer -->
           <tr>
-            <td style="padding: 16px 20px; border-top:1px solid #d0d7de; text-align:center; background-color:#f6f8fa;">
-              <p style="color:#8c959f; font-size:11px; letter-spacing:1px; margin:0;">
-                AUTOMATED VIA GITHUB ACTIONS &amp; GROQ AI
+            <td style="padding:14px 24px; border-top:1px solid #e0e0e0; text-align:center; background-color:#f9f9f9;">
+              <p style="color:#999999; font-size:11px; letter-spacing:1px; margin:0; text-transform:uppercase;">
+                Automated via GitHub Actions &amp; Groq AI
               </p>
             </td>
           </tr>
+
         </table>
       </td>
     </tr>
